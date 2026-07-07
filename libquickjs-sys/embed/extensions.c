@@ -18,11 +18,10 @@ int JS_Ext_ValueGetTag(JSValue v)
 int JS_Ext_GetRefCount(JSValue v)
 {
 
-    int tag = JS_Ext_ValueGetTag(v);
-    if (tag >= JS_TAG_FIRST)
+    if (JS_VALUE_HAS_REF_COUNT(v))
     {
-        JSRefCountHeader *ptr = (JSRefCountHeader *)JS_Ext_GetPtr(v);
-        return ptr->ref_count;
+        void *p = JS_VALUE_GET_PTR(v);
+        return JS_REF_COUNT(p);
     }
     else
     {
