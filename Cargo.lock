@@ -237,7 +237,7 @@ dependencies = [
 
 [[package]]
 name = "libquickjs-ng-sys"
-version = "0.11.0"
+version = "0.12.0"
 dependencies = [
  "bindgen",
  "cc",
@@ -327,7 +327,7 @@ dependencies = [
 
 [[package]]
 name = "quickjs-rusty"
-version = "0.12.0"
+version = "0.13.0"
 dependencies = [
  "anyhow",
  "chrono",
