@@ -283,6 +283,18 @@ fn serde_de_float() {
 }
 
 #[test]
+fn serde_de_float_with_integer_value_to_u32() {
+    let value = json!(1450.0);
+    assert_eq!(parse_from_js::<u32>(value), 1450);
+}
+
+#[test]
+fn serde_de_float_with_integer_value_to_i32() {
+    let value = json!(-1234.0);
+    assert_eq!(parse_from_js::<i32>(value), -1234);
+}
+
+#[test]
 fn serde_de_option_none() {
     let value = json!(None::<()>);
     assert_eq!(parse_from_js::<Option<()>>(value), None::<()>);

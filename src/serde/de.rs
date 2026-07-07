@@ -154,6 +154,164 @@ impl<'de> Deserializer<'de> {
             Err(Error::ExpectedString)
         }
     }
+
+    fn parse_integer_float(&self) -> Result<f64> {
+        let current = self.get_current();
+        if !current.is_float() {
+            return Err(Error::ExpectedFloat);
+        }
+
+        let value = current.to_float()?;
+
+        if !value.is_finite() || value.fract() != 0.0 {
+            return Err(Error::ExpectedInteger);
+        }
+
+        Ok(value)
+    }
+
+    fn parse_signed_integer(&self) -> Result<i64> {
+        let current = self.get_current();
+
+        if current.is_int() {
+            return Ok(i64::from(current.to_int()?));
+        }
+
+        if current.is_float() {
+            let value = self.parse_integer_float()?;
+            if value < i64::MIN as f64 || value > i64::MAX as f64 {
+                return Err(crate::ValueError::OutOfRange.into());
+            }
+            return Ok(value as i64);
+        }
+
+        #[cfg(feature = "bigint")]
+        if current.is_bigint() {
+            return current.to_bigint()?.as_i64().ok_or(Error::BigIntOverflow);
+        }
+
+        Err(Error::ExpectedInteger)
+    }
+
+    fn parse_unsigned_integer(&self) -> Result<u64> {
+        let current = self.get_current();
+
+        if current.is_int() {
+            let value = current.to_int()?;
+            if value < 0 {
+                return Err(crate::ValueError::OutOfRange.into());
+            }
+            return Ok(value as u64);
+        }
+
+        if current.is_float() {
+            let value = self.parse_integer_float()?;
+            if value < 0.0 || value > u64::MAX as f64 {
+                return Err(crate::ValueError::OutOfRange.into());
+            }
+            return Ok(value as u64);
+        }
+
+        #[cfg(feature = "bigint")]
+        if current.is_bigint() {
+            use num_traits::ToPrimitive;
+
+            return current
+                .to_bigint()?
+                .into_bigint()
+                .to_u64()
+                .ok_or(Error::BigIntOverflow);
+        }
+
+        Err(Error::ExpectedInteger)
+    }
+
+    #[cfg(feature = "bigint")]
+    fn parse_signed_integer_128(&self) -> Result<i128> {
+        let current = self.get_current();
+
+        if current.is_bigint() {
+            use num_traits::ToPrimitive;
+
+            return current
+                .to_bigint()?
+                .into_bigint()
+                .to_i128()
+                .ok_or(Error::BigIntOverflow);
+        }
+
+        if current.is_float() {
+            let value = self.parse_integer_float()?;
+            if value < i128::MIN as f64 || value > i128::MAX as f64 {
+                return Err(crate::ValueError::OutOfRange.into());
+            }
+            return Ok(value as i128);
+        }
+
+        self.parse_signed_integer().map(i128::from)
+    }
+
+    #[cfg(not(feature = "bigint"))]
+    fn parse_signed_integer_128(&self) -> Result<i128> {
+        if self.get_current().is_float() {
+            let value = self.parse_integer_float()?;
+            if value < i128::MIN as f64 || value > i128::MAX as f64 {
+                return Err(crate::ValueError::OutOfRange.into());
+            }
+            return Ok(value as i128);
+        }
+
+        self.parse_signed_integer().map(i128::from)
+    }
+
+    #[cfg(feature = "bigint")]
+    fn parse_unsigned_integer_128(&self) -> Result<u128> {
+        let current = self.get_current();
+
+        if current.is_bigint() {
+            use num_traits::ToPrimitive;
+
+            return current
+                .to_bigint()?
+                .into_bigint()
+                .to_u128()
+                .ok_or(Error::BigIntOverflow);
+        }
+
+        if current.is_float() {
+            let value = self.parse_integer_float()?;
+            if value < 0.0 || value > u128::MAX as f64 {
+                return Err(crate::ValueError::OutOfRange.into());
+            }
+            return Ok(value as u128);
+        }
+
+        self.parse_unsigned_integer().map(u128::from)
+    }
+
+    #[cfg(not(feature = "bigint"))]
+    fn parse_unsigned_integer_128(&self) -> Result<u128> {
+        if self.get_current().is_float() {
+            let value = self.parse_integer_float()?;
+            if value < 0.0 || value > u128::MAX as f64 {
+                return Err(crate::ValueError::OutOfRange.into());
+            }
+            return Ok(value as u128);
+        }
+
+        self.parse_unsigned_integer().map(u128::from)
+    }
+}
+
+macro_rules! deserialize_integer {
+    ($name:ident, $visit:ident, $helper:ident) => {
+        fn $name<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
+        where
+            V: Visitor<'de>,
+        {
+            visitor.$visit(self.$helper()?)
+        }
+    };
 }
 
 impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
@@ -219,11 +377,22 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
 
     forward_to_deserialize_any! {
         bool
-        i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64
+        f32 f64
         string char
         unit
         identifier ignored_any
     }
+
+    deserialize_integer!(deserialize_i8, visit_i64, parse_signed_integer);
+    deserialize_integer!(deserialize_i16, visit_i64, parse_signed_integer);
+    deserialize_integer!(deserialize_i32, visit_i64, parse_signed_integer);
+    deserialize_integer!(deserialize_i64, visit_i64, parse_signed_integer);
+    deserialize_integer!(deserialize_i128, visit_i128, parse_signed_integer_128);
+    deserialize_integer!(deserialize_u8, visit_u64, parse_unsigned_integer);
+    deserialize_integer!(deserialize_u16, visit_u64, parse_unsigned_integer);
+    deserialize_integer!(deserialize_u32, visit_u64, parse_unsigned_integer);
+    deserialize_integer!(deserialize_u64, visit_u64, parse_unsigned_integer);
+    deserialize_integer!(deserialize_u128, visit_u128, parse_unsigned_integer_128);
 
     fn deserialize_str<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
     where
