@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### New Features
+
+ - <csr-id-f098ba7dbd0d6d0d00209aa9220304e19932afa3/> add truncate-float-to-int feature for float to integer conversion
+ - <csr-id-751d15b89ce890549cee51172c4dc41dbf91195c/> optimize integer parsing in deserializer
+
+### Bug Fixes
+
+ - <csr-id-6eff8a7606b3dcc8ec101993d36784c2653f6d94/> handle proxy cases in deserializer
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 3 commits contributed to the release over the course of 30 calendar days.
+ - 43 days passed between releases.
+ - 3 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Add truncate-float-to-int feature for float to integer conversion ([`f098ba7`](https://github.com/Icemic/quickjs-rusty/commit/f098ba7dbd0d6d0d00209aa9220304e19932afa3))
+    - Optimize integer parsing in deserializer ([`751d15b`](https://github.com/Icemic/quickjs-rusty/commit/751d15b89ce890549cee51172c4dc41dbf91195c))
+    - Handle proxy cases in deserializer ([`6eff8a7`](https://github.com/Icemic/quickjs-rusty/commit/6eff8a7606b3dcc8ec101993d36784c2653f6d94))
+</details>
+
 ## 0.12.0 (2026-05-25)
 
 ### Bug Fixes
