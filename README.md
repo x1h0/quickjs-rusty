@@ -47,6 +47,7 @@ The crate supports the following features:
 - `chrono`: _(default enabled)._ chrono integration
   - adds a `JsValue::Date` variant that can be (de)serialized to/from a JS `Date`
 - `bigint`: _(default enabled)._ arbitrary precision integer support via [num-bigint](https://github.com/rust-num/num-bigint)
+- `truncate-float-to-int`: _(default disabled)._ when enabled, float values will be truncated to integers when converting to integer types. When disabled, only float with zero fractional part will be converted to integer types, otherwise an error will be returned. 
 
 ## Installation
 

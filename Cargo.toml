@@ -17,6 +17,7 @@ features = ["chrono", "bigint"]
 bigint = ["num-bigint", "num-traits"]
 default = ["chrono", "serde", "bigint"]
 serde = ["thiserror", "dep:serde"]
+truncate-float-to-int = []
 
 [dependencies]
 anyhow = {version = "1"}

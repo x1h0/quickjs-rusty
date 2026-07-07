@@ -163,11 +163,23 @@ impl<'de> Deserializer<'de> {
 
         let value = current.to_float()?;
 
-        if !value.is_finite() || value.fract() != 0.0 {
-            return Err(Error::ExpectedInteger);
+        #[cfg(feature = "truncate-float-to-int")]
+        {
+            if !value.is_finite() {
+                return Err(Error::ExpectedInteger);
+            }
+
+            Ok(value.trunc())
         }
 
-        Ok(value)
+        #[cfg(not(feature = "truncate-float-to-int"))]
+        {
+            if !value.is_finite() || value.fract() != 0.0 {
+                return Err(Error::ExpectedInteger);
+            }
+
+            Ok(value)
+        }
     }
 
     fn parse_signed_integer(&self) -> Result<i64> {

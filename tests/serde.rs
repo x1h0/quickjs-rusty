@@ -221,13 +221,15 @@ fn serde_ser_map() {
     assert!(json_str.contains("\"c\":3"));
 }
 
-fn parse_from_js<T: serde::de::DeserializeOwned>(value: Value) -> T {
+fn parse_from_js_result<T: serde::de::DeserializeOwned>(value: Value) -> quickjs_rusty::serde::Result<T> {
     let context = Context::builder().build().unwrap();
-    // use our to_js function to convert rust value to js value
-    // now it is a js value in quickjs context
     let js_value = to_js(unsafe { context.context_raw() }, &value).unwrap();
 
-    match from_js::<T>(unsafe { context.context_raw() }, &js_value) {
+    from_js::<T>(unsafe { context.context_raw() }, &js_value)
+}
+
+fn parse_from_js<T: serde::de::DeserializeOwned>(value: Value) -> T {
+    match parse_from_js_result(value) {
         Ok(v) => v,
         Err(err) => {
             panic!("{}", err);
@@ -291,6 +293,34 @@ fn serde_de_float_with_integer_value_to_u32() {
 #[test]
 fn serde_de_float_with_integer_value_to_i32() {
     let value = json!(-1234.0);
+    assert_eq!(parse_from_js::<i32>(value), -1234);
+}
+
+#[cfg(not(feature = "truncate-float-to-int"))]
+#[test]
+fn serde_de_float_with_fractional_value_to_u32_rejects() {
+    let value = json!(1450.9);
+    assert!(parse_from_js_result::<u32>(value).is_err());
+}
+
+#[cfg(not(feature = "truncate-float-to-int"))]
+#[test]
+fn serde_de_float_with_fractional_value_to_i32_rejects() {
+    let value = json!(-1234.9);
+    assert!(parse_from_js_result::<i32>(value).is_err());
+}
+
+#[cfg(feature = "truncate-float-to-int")]
+#[test]
+fn serde_de_float_with_fractional_value_to_u32_truncates() {
+    let value = json!(1450.9);
+    assert_eq!(parse_from_js::<u32>(value), 1450);
+}
+
+#[cfg(feature = "truncate-float-to-int")]
+#[test]
+fn serde_de_float_with_fractional_value_to_i32_truncates() {
+    let value = json!(-1234.9);
     assert_eq!(parse_from_js::<i32>(value), -1234);
 }
 
