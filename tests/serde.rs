@@ -221,7 +221,9 @@ fn serde_ser_map() {
     assert!(json_str.contains("\"c\":3"));
 }
 
-fn parse_from_js_result<T: serde::de::DeserializeOwned>(value: Value) -> quickjs_rusty::serde::Result<T> {
+fn parse_from_js_result<T: serde::de::DeserializeOwned>(
+    value: Value,
+) -> quickjs_rusty::serde::Result<T> {
     let context = Context::builder().build().unwrap();
     let js_value = to_js(unsafe { context.context_raw() }, &value).unwrap();
 
