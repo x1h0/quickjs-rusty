@@ -9,13 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Upgrade quickjs-ng to latest.
 
+### Chore
+
+ - <csr-id-00d800363c0346d7fc108432f9ffec260bf3a5be/> update libquickjs-sys changelog
+
 ### Commit Statistics
 
 <csr-read-only-do-not-edit/>
 
- - 1 commit contributed to the release.
+ - 2 commits contributed to the release.
  - 29 days passed between releases.
- - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
@@ -25,6 +29,7 @@ Upgrade quickjs-ng to latest.
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Update libquickjs-sys changelog ([`00d8003`](https://github.com/Icemic/quickjs-rusty/commit/00d800363c0346d7fc108432f9ffec260bf3a5be))
     - Update quickjs-ng ([`4f50910`](https://github.com/Icemic/quickjs-rusty/commit/4f50910ae189e76a9d991c5db6d7bf8fe2bad5ab))
 </details>
 

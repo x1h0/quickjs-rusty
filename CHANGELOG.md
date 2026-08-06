@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.14.0 (2026-08-06)
+
+### Bug Fixes
+
+ - <csr-id-ee0518d2c819f8e868eb8a38bb9122972e22343c/> deserialize integer-valued floats as integers
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 1 commit contributed to the release.
+ - 29 days passed between releases.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Deserialize integer-valued floats as integers ([`ee0518d`](https://github.com/Icemic/quickjs-rusty/commit/ee0518d2c819f8e868eb8a38bb9122972e22343c))
+</details>
+
 ## 0.13.0 (2026-07-07)
 
 ### New Features
