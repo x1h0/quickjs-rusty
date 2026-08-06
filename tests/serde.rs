@@ -298,6 +298,40 @@ fn serde_de_float_with_integer_value_to_i32() {
     assert_eq!(parse_from_js::<i32>(value), -1234);
 }
 
+#[derive(Debug, serde::Deserialize, PartialEq)]
+#[serde(
+    tag = "subCommand",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
+enum InternallyTaggedIntegerCommand {
+    Load { settings: IntegerSettings },
+}
+
+#[derive(Debug, serde::Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+struct IntegerSettings {
+    fade_time: Option<u32>,
+    volume: f64,
+}
+
+#[test]
+fn serde_de_float_with_integer_value_in_internally_tagged_enum() {
+    let value = json!({
+        "subCommand": "load",
+        "settings": { "fadeTime": 0.0, "volume": 0.0 }
+    });
+    assert_eq!(
+        parse_from_js::<InternallyTaggedIntegerCommand>(value),
+        InternallyTaggedIntegerCommand::Load {
+            settings: IntegerSettings {
+                fade_time: Some(0),
+                volume: 0.0,
+            },
+        }
+    );
+}
+
 #[cfg(not(feature = "truncate-float-to-int"))]
 #[test]
 fn serde_de_float_with_fractional_value_to_u32_rejects() {

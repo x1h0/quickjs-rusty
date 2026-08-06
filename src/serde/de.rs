@@ -353,7 +353,21 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
             JsTag::Null => visitor.visit_unit(),
             JsTag::String => visitor.visit_string(current.to_string()?),
             JsTag::RopeString => visitor.visit_string(current.to_string()?),
-            JsTag::Float64 => visitor.visit_f64(current.to_float()?),
+            JsTag::Float64 => {
+                let value = current.to_float()?;
+                if value.is_finite() && value.fract() == 0.0 {
+                    // u64::MAX rounds to 2^64 as f64, so the upper bound must be exclusive.
+                    if value >= 0.0 && value < u64::MAX as f64 {
+                        visitor.visit_u64(value as u64)
+                    } else if value >= i64::MIN as f64 && value < 0.0 {
+                        visitor.visit_i64(value as i64)
+                    } else {
+                        visitor.visit_f64(value)
+                    }
+                } else {
+                    visitor.visit_f64(value)
+                }
+            }
             JsTag::Object => {
                 if current.is_array() {
                     self.deserialize_seq(visitor)
